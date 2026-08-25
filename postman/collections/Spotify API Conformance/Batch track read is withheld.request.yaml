@@ -1,0 +1,23 @@
+$kind: http-request
+name: Batch track read is withheld
+description: |-
+  Canary for the `get_track_info` batching defect. `/v1/tracks?ids=` answers 403
+  while the single-track route works, so anything longer than one ID degrades to
+  one request per track.
+
+  If this returns 200, batching is available again and the per-track fallback
+  becomes dead weight.
+method: GET
+url: https://api.spotify.com/v1/tracks?ids=6ADPS6h7kuqZwqekUrLTEp,7AvWmlcIj7LhwnVqNT4UYa
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test(
+        "batch track read still withheld (200 here means the per-track fallback can go)",
+        () => pm.response.to.have.status(403)
+      );
+order: 7000

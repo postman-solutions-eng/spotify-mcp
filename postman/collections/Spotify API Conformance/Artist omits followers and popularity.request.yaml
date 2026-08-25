@@ -1,0 +1,32 @@
+$kind: http-request
+name: Artist omits followers and popularity
+description: |-
+  Regime indicator. A restricted app gets an artist object stripped of
+  `followers` and `popularity`; a full/legacy app gets both. Those fields are
+  optional on the `Artist` model precisely so this degrades rather than throws.
+
+  If they reappear, this app has moved to the full regime and the rest of this
+  collection is expected to change with it.
+method: GET
+url: https://api.spotify.com/v1/artists/5zbSsk4Qg514fYzb3KhQX7
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("artist is readable", () => pm.response.to.have.status(200));
+      const a = pm.response.json();
+      pm.test("artist has a name and id", () => {
+        pm.expect(a.name).to.be.a("string").and.not.empty;
+        pm.expect(a.id).to.eql("5zbSsk4Qg514fYzb3KhQX7");
+      });
+      pm.test(
+        "followers/popularity still stripped (their return means this app moved to the full regime)",
+        () => {
+          pm.expect(a.followers, "followers").to.be.undefined;
+          pm.expect(a.popularity, "popularity").to.be.undefined;
+        }
+      );
+order: 4000

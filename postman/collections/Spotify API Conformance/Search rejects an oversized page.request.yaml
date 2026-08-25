@@ -1,0 +1,23 @@
+$kind: http-request
+name: Search rejects an oversized page
+description: |-
+  Canary for the search page cap. A restricted app is capped at 10 and answers
+  400 "Invalid limit" above it, which is why `search_music` retries instead of
+  advertising 50.
+
+  If this starts returning 200, the cap has been lifted and
+  `_RESTRICTED_SEARCH_LIMIT` in `spotify_api.py` can rise.
+method: GET
+url: https://api.spotify.com/v1/search?q=trance&type=track&limit=11
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test(
+        "limit above the cap is still rejected (200 here means the cap lifted - raise _RESTRICTED_SEARCH_LIMIT)",
+        () => pm.response.to.have.status(400)
+      );
+order: 3000

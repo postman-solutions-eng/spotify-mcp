@@ -1,0 +1,20 @@
+$kind: http-request
+name: Album read reports total_tracks
+description: |-
+  Albums still report their own counts, unlike playlists where `tracks.total` is
+  stripped. `get_album_info` also makes a second call for the track list and that
+  one is not withheld, which is why albums work where artists do not.
+method: GET
+url: https://api.spotify.com/v1/albums/7y8mOM5mWNSAean59dK3co
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("album is readable", () => pm.response.to.have.status(200));
+      const a = pm.response.json();
+      pm.test("total_tracks is a number", () => pm.expect(a.total_tracks).to.be.a("number"));
+      pm.test("tracks are inlined", () => pm.expect(a.tracks.items).to.be.an("array").that.is.not.empty);
+order: 8000

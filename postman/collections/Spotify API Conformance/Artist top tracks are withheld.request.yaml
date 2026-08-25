@@ -1,0 +1,23 @@
+$kind: http-request
+name: Artist top tracks are withheld
+description: |-
+  Canary for the `get_artist_info` defect. This endpoint answers 403, which is
+  not one of `with_fallback`'s regime-miss statuses and has no alternative path,
+  so `get_artist_info` degrades to an empty `top_tracks` instead of failing.
+
+  If this returns 200, that workaround can be removed and the tool can serve top
+  tracks again.
+method: GET
+url: https://api.spotify.com/v1/artists/5zbSsk4Qg514fYzb3KhQX7/top-tracks?market=DE
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test(
+        "top-tracks still withheld (200 here means get_artist_info can stop degrading)",
+        () => pm.response.to.have.status(403)
+      );
+order: 5000

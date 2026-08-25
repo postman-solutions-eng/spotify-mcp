@@ -3,5 +3,6 @@ workspace:
 cloudResources:
   collections:
     ../postman/collections/Spotify: 6a8d5e4ba15fa52c766b3eda
+    ../postman/collections/Spotify API Conformance: 52224998-f2967094-bc38-41c2-b773-4fe6484a6da2
   environments:
     ../postman/environments/Spotify MCP.environment.yaml: 52224998-c038b70f-dd9a-4191-b990-da5168bd4c98

@@ -1,0 +1,19 @@
+$kind: http-request
+name: Search page cap
+description: |-
+  The largest page size search will serve. `spotify_api.search()` clamps to this
+  and retries at 10 when a bigger page is rejected.
+method: GET
+url: https://api.spotify.com/v1/search?q=trance&type=track&limit=10
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("search at limit=10 is served", () => pm.response.to.have.status(200));
+      const page = pm.response.json().tracks;
+      pm.test("returns no more rows than requested", () => pm.expect(page.items.length).to.be.at.most(10));
+      pm.test("echoes the requested limit", () => pm.expect(page.limit).to.eql(10));
+order: 2000

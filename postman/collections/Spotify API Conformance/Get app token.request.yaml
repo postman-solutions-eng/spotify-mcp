@@ -1,0 +1,26 @@
+$kind: http-request
+name: Get app token
+description: |-
+  Mint a client-credentials token. Every check in this collection is reachable
+  without user consent, which is what makes the collection runnable unattended
+  in a monitor.
+method: POST
+url: https://accounts.spotify.com/api/token
+headers:
+  Content-Type: application/x-www-form-urlencoded
+auth:
+  type: basic
+  credentials:
+    username: "{{SPOTIFY_CLIENT_ID}}"
+    password: "{{SPOTIFY_CLIENT_SECRET}}"
+body:
+  type: text
+  content: grant_type=client_credentials
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("token endpoint returns 200", () => pm.response.to.have.status(200));
+      const token = pm.response.json().access_token;
+      pm.test("access_token present", () => pm.expect(token).to.be.a("string").and.not.empty);
+      pm.collectionVariables.set("access_token", token);
+order: 1000

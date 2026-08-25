@@ -1,0 +1,68 @@
+$kind: collection
+description: |-
+  Live conformance checks against `api.spotify.com`, built to run unattended in a
+  Postman monitor and fail when Spotify changes what this app is allowed to do.
+
+  ## What this is not
+
+  It is **not** a port of the Python suite. Those 169 tests are offline unit tests
+  against mocked spotipy calls — they assert this server's own transformation logic
+  and cannot, by construction, notice an upstream change. `CLAUDE.md` puts it
+  bluntly: *"the test suite will lie to you"*. The sibling
+  spotify-mcp-cloudflare project had 42 green tests while all 24 of its tools were
+  dead in production.
+
+  So these requests deliberately go straight to Spotify over HTTP, with no MCP
+  server and no mocks in the path. They encode the *upstream contract* the server
+  depends on, not the server's internals.
+
+  ## What each check is for
+
+  | Request | Asserts | Fires when |
+  |---|---|---|
+  | Get app token | client-credentials grant works | credentials rotated or revoked |
+  | Search page cap | `limit=10` served, rows ≤ 10 | search page size changes |
+  | Search rejects an oversized page | `limit=11` → 400 | the cap is lifted |
+  | Artist omits followers and popularity | both absent | this app moves regime |
+  | Artist top tracks are withheld | 403 | the endpoint is restored |
+  | Single track read works | 200 | the per-track fallback route breaks |
+  | Batch track read is withheld | 403 | batching is restored |
+  | Album read reports total_tracks | count present, tracks inlined | albums start behaving like playlists |
+
+  Four of these assert that something is **currently broken**. That is deliberate:
+  a monitor is only useful if it fires on *change*, in either direction. Each such
+  test says in its own failure message what to do in the code when it flips, so an
+  alert is actionable without re-deriving the diagnosis.
+
+  ## Running it
+
+  Needs `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET`. No user consent, no
+  refresh token, no Premium — every check is reachable with an app-only token,
+  which is what makes it safe to run on a schedule.
+
+  Locally:
+
+      postman collection run "postman/collections/Spotify API Conformance" \
+        --env-var "SPOTIFY_CLIENT_ID=$SPOTIFY_CLIENT_ID" \
+        --env-var "SPOTIFY_CLIENT_SECRET=$SPOTIFY_CLIENT_SECRET"
+
+  As a monitor, select the **Spotify API Conformance** environment — *not* the
+  Spotify MCP one. That one resolves its credentials from the local Postman Vault,
+  and vault values never sync, so they cannot resolve in Postman's cloud.
+
+  The Spotify API Conformance environment is **cloud-only and deliberately not
+  git-synced**. There is no file for it under `postman/environments/`, and that is
+  not an oversight: a tracked file cannot hold the client secret, and an empty
+  tracked file overwrites the cloud values with blanks on every
+  `postman workspace push` — verified, it silently breaks the monitor. Keeping the
+  environment out of git sync is what makes the credentials durable. Edit it in the
+  Postman UI or via the API, never from this repo.
+
+  Read-only throughout: no playback is started, nothing is saved, no playlist is
+  touched. Running it repeatedly changes nothing about the account.
+
+  ## Quota
+
+  Every run costs 8 requests against the monitor allowance, which since July 2026
+  is counted per **developer account** rather than per app. Check headroom before
+  picking a frequency.
