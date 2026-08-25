@@ -1,12 +1,28 @@
 $kind: mcp-request
 description: |-
-  **Purpose:** start a specific track by ID (MJRSBRN = Major Sunburn).
+  **Purpose:** start a two-track Major Sunburn context by ID (MJRSBRN = Major Sunburn).
+  `track_ids` takes a list, so this doubles as the demonstration that a multi-track
+  context works — the tracks play in the order given.
 
-  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): now playing "Und dann kommt ein Mensch" — Major Sunburn,
-  `progress_ms: 89`.
+  1. "Was Ist Freundschaft Wert (Major Sunburn Harmony Edit)" — By York
+     (`7AvWmlcIj7LhwnVqNT4UYa`)
+  2. "Und dann kommt ein Mensch" — Major Sunburn (`6ADPS6h7kuqZwqekUrLTEp`)
 
-  Note: passing `track_ids` replaces the playback context with just those tracks, which
-  is why "Show queue" afterwards reports the same track repeated.
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): playing the
+  Harmony Edit on `PM-MYKFWG6W19`, with "Und dann kommt ein Mensch" queued next.
+  "Show queue" confirms the two alternating rather than one repeating.
+
+  `progress_ms` is not necessarily 0: if the first track was already loaded, Spotify
+  resumes it where it was (observed 45047) rather than restarting it. Add a `seek` after
+  this if you need a deterministic start position.
+
+  Note: passing `track_ids` *replaces* the playback context with exactly those tracks,
+  so Spotify pads the queue by cycling them. It does not append to what was playing —
+  use "Add to queue" for that.
+
+  Needs Premium and an active device. If the device has gone idle this returns
+  `NO_ACTIVE_DEVICE`; run "List devices" then "Transfer playback" first, or pass a
+  `device_id` here.
 transport: stdio
 command: uvx spotify-mcp-jamiew
 env:
@@ -20,7 +36,7 @@ message: |-
       "name": "control_playback",
       "arguments": {
         "action": "play",
-        "track_ids": ["6ADPS6h7kuqZwqekUrLTEp"],
+        "track_ids": ["7AvWmlcIj7LhwnVqNT4UYa", "6ADPS6h7kuqZwqekUrLTEp"],
         "context_uri": null,
         "position_ms": null,
         "volume_percent": null,

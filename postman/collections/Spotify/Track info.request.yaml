@@ -1,11 +1,26 @@
 $kind: mcp-request
 description: |-
-  **Purpose:** track metadata by ID. Accepts a single string *or* a list — batching up
-  to 50 IDs costs one upstream call instead of 50.
+  **Purpose:** track metadata by ID. Accepts a single string *or* a list, and the tool
+  advertises batching up to 50 IDs as one upstream call instead of 50.
 
   **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): 1 track — "Und dann kommt ein Mensch" — Major Sunburn, album
   `7y8mOM5mWNSAean59dK3co`, released 2026-01-22, 185200 ms. `popularity` is null (a
   field the restricted regime strips, optional by design).
+
+  **Batching does not currently work.** Two or more IDs fail outright:
+
+  - `"6ADPS6h7kuqZwqekUrLTEp"` (bare string) — works
+  - `["6ADPS6h7kuqZwqekUrLTEp"]` (list of one) — works
+  - `["6ADPS6h7kuqZwqekUrLTEp", "7AvWmlcIj7LhwnVqNT4UYa"]` — fails with
+    `Playback is restricted for this content [playback_restricted]`
+
+  A one-element list takes the single-track path; anything longer uses the batch endpoint
+  (`/v1/tracks?ids=`), which is withheld from this app. So the efficiency the docstring
+  promises is unavailable — loop the single-ID form instead. This is the same class of
+  failure as "Artist Info Major Tom": one call in a tool is withheld and takes the whole
+  tool down with it.
+
+  This is why the two Major Sunburn tracks are paired in "Play MJRSBRN" rather than here.
 transport: stdio
 command: uvx spotify-mcp-jamiew
 env:

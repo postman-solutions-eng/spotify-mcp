@@ -37,6 +37,11 @@ description: |-
       when it had to activate an idle device — read back with `get_playback_state`.
       
   - `get_top_items` returned 1 artist for `limit: 5`.
+
+  - `get_track_info` **cannot batch**. One ID works (bare or as a single-element list),
+    two or more fail with `playback_restricted`, because anything longer than one uses the
+    withheld `/v1/tracks?ids=` endpoint. The docstring's "50 tracks = 1 API call" is
+    unreachable; loop the single-ID form. Same shape as the `get_artist_info` defect.
       
 
   ## Provenance

@@ -2,13 +2,15 @@ $kind: mcp-request
 description: |-
   **Purpose:** read what is playing plus the upcoming queue.
 
-  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): `currently_playing` = "Und dann kommt ein Mensch" — Major Sunburn,
-  followed by 10 queue entries that are all *the same track*.
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)):
+  `currently_playing` = "Und dann kommt ein Mensch" — Major Sunburn, followed by 12 queue
+  entries alternating it with "Was Ist Freundschaft Wert (Major Sunburn Harmony Edit)".
 
-  That repetition is a consequence of "Play MJRSBRN", not a bug: starting playback with an
-  explicit `track_ids` list replaces the context with just those tracks, so Spotify pads
-  the queue by repeating. Run this after playing a playlist context to see a varied
-  queue.
+  That cycling is a consequence of "Play MJRSBRN", not a bug: starting playback with an
+  explicit `track_ids` list replaces the context with exactly those tracks, so Spotify
+  pads the queue by repeating the set. Two tracks alternate; a single-track context
+  repeats one track over and over. Run this after playing a playlist context to see a
+  genuinely varied queue.
 transport: stdio
 command: uvx spotify-mcp-jamiew
 env:
