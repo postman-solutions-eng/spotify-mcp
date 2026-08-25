@@ -1,0 +1,35 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** fetch the `create_mood_playlist` **prompt** with
+  mood=melancholic, genre=trance, decade=90s.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio), read from the prompt implementation — prompts are pure string
+  builders, so output is deterministic for given arguments): returns the instruction
+  text "Create a Spotify playlist for a melancholic mood with trance music from the 90s",
+  followed by the 3-step workflow (`search_music` → `create_playlist` →
+  `add_tracks_to_playlist`), pagination tips, and a 15-20 song target.
+
+  A prompt returns a template for the *client* to act on; it performs no Spotify calls
+  itself.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "prompts/get",
+    "params": {
+      "name": "create_mood_playlist",
+      "arguments": {
+        "mood": "melancholic",
+        "genre": "trance",
+        "decade": "90s"
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 10000

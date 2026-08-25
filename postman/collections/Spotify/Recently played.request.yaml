@@ -1,0 +1,31 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** listening history, most recent first, each entry carrying `played_at`.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): 5 items — "Raise Your Glass" — P!nk (15:15:06Z),
+  "Since U Been Gone" — Kelly Clarkson (15:11:43Z), "Sk8er Boi" — Avril Lavigne
+  (15:08:33Z), "I Just Can't Stop Loving You" — Michael Jackson (10:48:25Z),
+  "Thriller" — Michael Jackson (09:28:22Z).
+
+  Together with `get_top_items` this is the substitute for the withdrawn
+  `/recommendations` endpoint.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "get_recently_played",
+      "arguments": {
+        "limit": 5
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 34000

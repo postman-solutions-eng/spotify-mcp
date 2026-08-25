@@ -1,0 +1,27 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** unfollow a playlist. For a playlist you own, Spotify treats unfollow as
+  deletion, which is why this is marked **destructive**.
+
+  **Result:** Not executed: mutates the live account. Left documented, unrun, on purpose. The ID shown is the followed "Game of Thrones Soundtrack (All
+  Seasons)" (owner: Low Fidelity), so this would drop it from the library.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "unfollow_playlist",
+      "arguments": {
+        "playlist_id": "26ydPfDpkjllVC0QqCWg82"
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 33000

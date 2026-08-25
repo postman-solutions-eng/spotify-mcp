@@ -1,0 +1,32 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** skip to the next track in the active context.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): advanced to "Complicated" — Avril Lavigne (*Let Go*, 2002),
+  `progress_ms: 78`. Requires Premium and an already-active device.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "control_playback",
+      "arguments": {
+        "action": "next",
+        "track_ids": null,
+        "context_uri": null,
+        "position_ms": null,
+        "volume_percent": null,
+        "state": null,
+        "device_id": null
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 3000

@@ -1,0 +1,35 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** the user's top artists over ~6 months. With `/recommendations`,
+  audio-features and related-artists withdrawn from third-party apps, this plus
+  `get_recently_played` is the measured foundation for any suggestion feature.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): **1** artist returned despite `limit: 5` — Cosmic Gate
+  (`6ySxYu68zTsO5ghsThpGtS`), with `genres: []`, `popularity` and `followers` null.
+  `tracks` is null, as expected when `item_type` is artists.
+
+  A result count far below the requested limit is one of the documented signatures of an
+  upstream change — worth a `/spotify-api-watch` run rather than assuming the account
+  simply has little history.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "get_top_items",
+      "arguments": {
+        "item_type": "artists",
+        "time_range": "medium_term",
+        "limit": 5
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 35000

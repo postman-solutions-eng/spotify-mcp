@@ -1,0 +1,24 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** playlist metadata via `spotify://playlist/{playlist_id}`.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): name, id, owner, empty description, `public: true`, and
+  `tracks`/`total_tracks` both null — the same null-count defect as the tool path, since
+  both build the same `Playlist` model.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "resources/read",
+    "params": {
+      "uri": "spotify://playlist/4rtBfFS2LRXA7jFbLhyDjJ"
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 38000

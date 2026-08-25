@@ -1,0 +1,27 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** enumerate available playback targets. The prerequisite for every playback
+  tool: they need an *active* device.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): 2 devices — `Web Player (Chrome)`
+  (`c207cabc8f0e687fe1e1cf9e0253bffe5c51dba8`, Computer, inactive, volume 100) and
+  `PM-MYKFWG6W19` (`ae1211a91758a296e0593b263c49c2d47a45291c`, Computer, **active**,
+  volume 90).
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "list_devices",
+      "arguments": {}
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 20000

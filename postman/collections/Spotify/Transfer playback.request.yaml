@@ -1,0 +1,28 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** move playback to another device — the documented recovery when
+  `list_devices` shows no active device and playback tools therefore fail.
+
+  **Result:** Not executed: mutates the live account. Left documented, unrun, on purpose. Running it would move your audio to the Chrome web player
+  mid-listen. Device IDs are per-session; refresh them with "List devices" first.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "transfer_playback",
+      "arguments": {
+        "device_id": "c207cabc8f0e687fe1e1cf9e0253bffe5c51dba8",
+        "play": true
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 21000

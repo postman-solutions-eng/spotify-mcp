@@ -1,0 +1,26 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** append a track to the playback queue. Additive, so
+  `destructiveHint` is false.
+
+  **Result:** Not executed: mutates the live account. Left documented, unrun, on purpose. Needs an active device and Premium.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "add_to_queue",
+      "arguments": {
+        "track_id": "6ADPS6h7kuqZwqekUrLTEp"
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 22000

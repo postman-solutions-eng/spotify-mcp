@@ -1,0 +1,27 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** change a playlist's name/description/visibility.
+
+  **Result:** Not executed: mutates the live account. Left documented, unrun, on purpose. Overwrites existing metadata with no undo.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "modify_playlist_details",
+      "arguments": {
+        "playlist_id": "1SFakhKgD1SbrY6DeUKUZQ",
+        "name": "My playlist #1 (renamed)",
+        "description": "Touched by the Postman collection"
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 28000

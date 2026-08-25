@@ -1,0 +1,30 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** album metadata plus its track list.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): "Und dann kommt ein Mensch" — Major Sunburn, `album_type: single`,
+  `total_tracks: 1`, released 2026-01-22 (`release_date_precision: day`), and the single
+  track inline. `label`, `popularity` null and `genres` empty.
+
+  Contrast with `get_artist_info`: this tool also makes a second upstream call (for
+  tracks) but that one still works, so albums are fine where artists are not.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "get_album_info",
+      "arguments": {
+        "album_id": "7y8mOM5mWNSAean59dK3co"
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 30000

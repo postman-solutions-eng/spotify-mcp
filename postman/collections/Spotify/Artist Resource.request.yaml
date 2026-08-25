@@ -1,0 +1,28 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** an artist via `spotify://artist/{artist_id}`.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): **works** — `{"name": "Major Sunburn", "id":
+  "5zbSsk4Qg514fYzb3KhQX7", "genres": [], "popularity": null, "followers": null}`.
+
+  This is the direct contrast to "Artist Info Major Tom (does not work)": the resource
+  calls only `spotify_client.artist()`, while the `get_artist_info` tool additionally
+  calls the dead `artist_top_tracks()` and fails outright. Until that tool is fixed, this
+  resource is the working way to resolve an artist.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "resources/read",
+    "params": {
+      "uri": "spotify://artist/5zbSsk4Qg514fYzb3KhQX7"
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 39000

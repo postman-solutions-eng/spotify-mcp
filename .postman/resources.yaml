@@ -1,0 +1,7 @@
+workspace:
+  id: 32272076-0f04-4b29-ad34-da1c96163d42
+cloudResources:
+  collections:
+    ../postman/collections/Spotify: 6a8d5e4ba15fa52c766b3eda
+  environments:
+    ../postman/environments/Spotify MCP.environment.yaml: 52224998-c038b70f-dd9a-4191-b990-da5168bd4c98

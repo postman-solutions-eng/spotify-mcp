@@ -1,0 +1,28 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** track metadata by ID. Accepts a single string *or* a list — batching up
+  to 50 IDs costs one upstream call instead of 50.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): 1 track — "Und dann kommt ein Mensch" — Major Sunburn, album
+  `7y8mOM5mWNSAean59dK3co`, released 2026-01-22, 185200 ms. `popularity` is null (a
+  field the restricted regime strips, optional by design).
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "get_track_info",
+      "arguments": {
+        "track_ids": "6ADPS6h7kuqZwqekUrLTEp"
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 24000

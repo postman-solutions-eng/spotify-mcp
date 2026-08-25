@@ -1,0 +1,32 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** page through a playlist's tracks. `limit: null` means "all tracks, up to
+  the 10,000 safety cap".
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): "My playlist #1" → 1 track, "Dandelions" — Ruth B.
+  (*Safe Haven*, 2017).
+
+  Known defect: `total` echoes the number of rows returned rather than the playlist
+  length, so it is useless for pagination maths.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "get_playlist_tracks",
+      "arguments": {
+        "playlist_id": "1SFakhKgD1SbrY6DeUKUZQ",
+        "limit": null,
+        "offset": 0
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 15000

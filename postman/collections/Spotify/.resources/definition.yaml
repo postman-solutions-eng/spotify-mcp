@@ -1,0 +1,83 @@
+$kind: collection
+description: |-
+  Spotify MCP collection for playback control, content discovery, playlist browsing, and  
+  user/library actions. Every request is an **AI (MCP) request** speaking JSON-RPC to  
+  `uvx spotify-mcp-jamiew` over stdio, covering all 25 tools, 6 resources and 5 prompts the  
+  server exposes.
+
+  Credentials come from the **Spotify MCP** environment (`{{SPOTIFY_CLIENT_ID}}`,  
+  `{{SPOTIFY_CLIENT_SECRET}}`, `{{SPOTIFY_REDIRECT_URI}}`) rather than being inlined per  
+  request. Select that environment before running anything.
+
+  ## Coverage
+
+  | Surface | Covered | Notes |
+  | --- | --- | --- |
+  | Tools | 25 / 25 | 8 pre-existing, 17 added |
+  | Resources | 6 / 6 | 1 pre-existing, 5 added |
+  | Prompts | 5 / 5 | 2 pre-existing, 3 added |
+
+  Requests whose description says "Not executed" mutate the live account (create/rename/  
+  reorder/unfollow/unlike, queue and device transfer). They are documented but deliberately  
+  never run. Everything else carries the real response captured on 2026-08-25 against  
+  spotify-mcp-jamiew 0.4.1.
+
+  ## Known defects found while documenting this
+
+  - `get_artist_info` is **dead for every artist** — it calls `artist_top_tracks()`, which  
+      returns `playback_restricted` and is not routed through `with_fallback`. The  
+      `spotify://artist/{id}` resource works because it omits that call.
+      
+  - `get_playlist_tracks` reports `total` as the returned page size, not the playlist  
+      length. `get_user_playlists`, `get_playlist_info` and the playlist resource return  
+      `tracks`/`total_tracks` as `null`. Together these make playlist size unobtainable  
+      without fetching every page.
+      
+  - `control_playback` can return an empty/`is_playing: false` state on a successful `play`  
+      when it had to activate an idle device — read back with `get_playback_state`.
+      
+  - `get_top_items` returned 1 artist for `limit: 5`.
+      
+
+  ## Provenance
+
+  Documented and extended by Claude Code (Opus 5) on 2026-08-25 from the prompt below.
+
+  This is a cleaned-up restatement, not the literal message that was typed. The original  
+  took several rounds to pin down — where the collection lived, which client could execute  
+  `mcp-request` items, which file format to use, how to sync, and what "link to vault  
+  entries" meant in practice. The version recorded here folds those answers in, so it  
+  should reproduce the same result in one pass:
+
+  ```
+  Document and complete the git-synced Postman collection at postman/collections/Spotify/
+  (v3 YAML, *.request.yaml). Every request in it is an AI/MCP request against this repo's
+  own server.
+  1. Execute the existing requests and document each with its purpose and its actual
+     result. Use the pre-connected `spotify` MCP server to do this — the Postman CLI skips
+     `mcp-request` items as unsupported — and don't write your own runner script. Use the
+     MCP resource reader for `resources/read`; there's no client tool for `prompts/get`, so
+     document those from the `@mcp.prompt` implementations instead. Run the read-only
+     requests for real. For requests that would mutate my Spotify account (create, rename,
+     reorder, unfollow, unlike, queue, device transfer), write the documentation but don't
+     run them, and say which ones you skipped. On the removal request, decline the
+     elicitation — the confirmation prompt is the point, not the deletion.
+  2. Close the coverage gap. Enumerate every @mcp.tool, @mcp.resource and @mcp.prompt in
+     src/spotify_mcp/fastmcp_server.py and add one request per capability not yet covered.
+     Then verify 100% coverage by diffing the decorators against the requests' JSON-RPC
+     messages.
+  3. Rewrite the collection description to include this prompt verbatim, a coverage table,
+     and any server defects you hit while executing.
+  4. Get the credentials out of the request files. SPOTIFY_CLIENT_ID,
+     SPOTIFY_CLIENT_SECRET and SPOTIFY_REDIRECT_URI are inlined in plaintext in every one.
+     Move them to a new environment at postman/environments/Spotify MCP.environment.yaml
+     (YAML v3, not .postman_environment.json) and have each request reference
+     {{SPOTIFY_CLIENT_ID}} and friends. In that environment, the two credentials should
+     hold symbolic Postman Vault references — {{vault:spotify-mcp-client-id}} and
+     {{vault:spotify-mcp-client-secret}} — because no API can create vault entries; I'll
+     create those by hand. Validate with `postman environment lint`.
+  5. Sync with `postman workspace push` when you're done. Don't create cloud entities
+     through the Postman MCP create* tools.
+  Flag anything you can't do rather than approximating it.
+
+   ```

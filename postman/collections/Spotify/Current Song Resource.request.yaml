@@ -1,0 +1,36 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** despite the name, this is *not* a resource read — the message is
+  `tools/call` → `control_playback` and is byte-identical to "Play MJRSBRN".
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): same as "Play MJRSBRN" — starts
+  "Und dann kommt ein Mensch" — Major Sunburn.
+
+  For the actual resource equivalent see "Current Playback Resource"
+  (`spotify://playback/current`). Consider renaming or deleting this duplicate.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "control_playback",
+      "arguments": {
+        "action": "play",
+        "track_ids": ["6ADPS6h7kuqZwqekUrLTEp"],
+        "context_uri": null,
+        "position_ms": null,
+        "volume_percent": null,
+        "state": null,
+        "device_id": null
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 8000

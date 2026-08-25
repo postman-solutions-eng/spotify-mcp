@@ -1,0 +1,31 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** playlist metadata *without* tracks — the cheap counterpart to
+  "Show playlist details".
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): "Backstreet Boys, Avril Lavigne, Michael Jackson, Taylor Swift",
+  owner Johannes Nicolai, `public: true`.
+
+  Known defect: `tracks` and `total_tracks` are both null even though the playlist holds
+  65 tracks — so the documented way to "check total_tracks to understand playlist size"
+  (see the `analyze_large_playlist` prompt) does not currently work.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "get_playlist_info",
+      "arguments": {
+        "playlist_id": "4rtBfFS2LRXA7jFbLhyDjJ"
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 25000

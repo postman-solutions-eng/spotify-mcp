@@ -1,0 +1,24 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** album metadata via `spotify://album/{album_id}`.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): album fields only — name, artist, release date/precision,
+  `total_tracks: 1`, `album_type: single`. No track list, unlike the `get_album_info`
+  tool.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "resources/read",
+    "params": {
+      "uri": "spotify://album/7y8mOM5mWNSAean59dK3co"
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 40000

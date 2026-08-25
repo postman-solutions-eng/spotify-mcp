@@ -1,0 +1,21 @@
+$kind: mcp-request
+name: https://mcp-gateway-external-pilot.spotify.net/mcp (does not work - see OAuth debugger)
+description: |-
+  **Purpose:** probe Spotify's own internal MCP gateway over SSE with OAuth 2.
+
+  **Result:** not executable. There is no `message` body, and the OAuth handshake against
+  this host does not complete (see Postman's OAuth debugger). Retained as a record of the
+  attempt — the rest of this collection talks to the local `spotify-mcp-jamiew` server
+  over stdio instead.
+transport: sse
+url: https://mcp-gateway-external-pilot.spotify.net/mcp
+message: ""
+auth:
+  type: oauth2
+  credentials:
+    addTokenTo: header
+settings:
+  version: auto
+  strictSSL: false
+  requestTimeout: 0
+order: 1000

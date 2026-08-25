@@ -1,0 +1,31 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** list the signed-in user's playlists, first page.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): `total: 5` — Melancholic 90s Trance, Game of Thrones Soundtrack
+  (All Seasons) (owner: Low Fidelity), Lilli & Thomas (owner: thomasbrits), "Backstreet
+  Boys, Avril Lavigne, Michael Jackson, Taylor Swift", My playlist #1.
+
+  Known defect: `tracks` and `total_tracks` come back `null` for every entry, so this
+  response cannot be used to find the largest playlist.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "get_user_playlists",
+      "arguments": {
+        "limit": 20,
+        "offset": 0
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 11000

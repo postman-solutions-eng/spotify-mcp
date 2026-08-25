@@ -1,0 +1,35 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** start a specific track by ID (MJRSBRN = Major Sunburn).
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): now playing "Und dann kommt ein Mensch" — Major Sunburn,
+  `progress_ms: 89`.
+
+  Note: passing `track_ids` replaces the playback context with just those tracks, which
+  is why "Show queue" afterwards reports the same track repeated.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "control_playback",
+      "arguments": {
+        "action": "play",
+        "track_ids": ["6ADPS6h7kuqZwqekUrLTEp"],
+        "context_uri": null,
+        "position_ms": null,
+        "volume_percent": null,
+        "state": null,
+        "device_id": null
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 7000

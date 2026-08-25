@@ -1,0 +1,23 @@
+name: Spotify MCP
+values:
+  - key: SPOTIFY_CLIENT_ID
+    value: '{{vault:spotify-mcp-client-id}}'
+    type: default
+    enabled: true
+    description: >-
+      Resolves from the Postman Vault key `spotify-mcp-client-id`. The reference is stored
+      here, never the value — vault secrets live locally and are not synced to the Postman
+      cloud or to git. Create the key via Vault in the Postman desktop app.
+  - key: SPOTIFY_CLIENT_SECRET
+    value: '{{vault:spotify-mcp-client-secret}}'
+    type: default
+    enabled: true
+    description: >-
+      Resolves from the Postman Vault key `spotify-mcp-client-secret`.
+  - key: SPOTIFY_REDIRECT_URI
+    value: http://127.0.0.1:8888
+    type: default
+    enabled: true
+    description: >-
+      OAuth redirect URI. Not sensitive, but must match the redirect registered on the
+      Spotify app exactly.

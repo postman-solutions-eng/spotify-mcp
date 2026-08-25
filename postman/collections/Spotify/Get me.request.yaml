@@ -1,0 +1,27 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** the signed-in user's profile via the `get_me` tool.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): id `31et4tmmf46ixoe7tltp43sjxvk4`, Johannes Nicolai,
+  `nicolai.johannes@googlemail.com`, country DE, product **premium**, followers 0.
+
+  `email`, `country` and `product` are all populated, confirming full/legacy regime —
+  under the restricted regime these come back empty rather than erroring.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "get_me",
+      "arguments": {}
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 19000

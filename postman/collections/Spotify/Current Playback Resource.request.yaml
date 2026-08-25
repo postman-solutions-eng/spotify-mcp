@@ -1,0 +1,26 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** playback state as an MCP **resource** rather than a tool call.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): `is_playing: true`, track (name/artist/album/id), device
+  `PM-MYKFWG6W19`, `progress_ms: 103761`.
+
+  Deliberately slimmer than the `get_playback_state` tool: no `volume`, `shuffle` or
+  `repeat`. Use the resource for cheap context, the tool when you need the full state.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "resources/read",
+    "params": {
+      "uri": "spotify://playback/current"
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 36000

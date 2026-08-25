@@ -1,0 +1,33 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** move a slice of a playlist. Positions are zero-based and come from
+  `get_playlist_tracks`.
+
+  **Result:** Not executed: mutates the live account. Left documented, unrun, on purpose. Marked **destructive** — it rewrites existing ordering, which
+  cannot be recovered from the response.
+
+  The arguments shown would move "Thriller" (position 1) to the front of the MJ
+  playlist.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "reorder_playlist_tracks",
+      "arguments": {
+        "playlist_id": "4rtBfFS2LRXA7jFbLhyDjJ",
+        "range_start": 1,
+        "insert_before": 0,
+        "range_length": 1
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 29000

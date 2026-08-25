@@ -1,0 +1,28 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** remove tracks from Liked Songs — the inverse of "Like track".
+
+  **Result:** Not executed: mutates the live account. Left documented, unrun, on purpose. Marked **destructive**: it deletes an existing library entry.
+  Running it would undo "Like track".
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "remove_saved_tracks",
+      "arguments": {
+        "track_ids": [
+          "6ADPS6h7kuqZwqekUrLTEp"
+        ]
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 32000

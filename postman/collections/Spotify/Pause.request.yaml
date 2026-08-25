@@ -1,0 +1,32 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** pause playback on the active device.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): `is_playing: false`, frozen at `progress_ms: 7295` on
+  "Complicated". The track stays loaded, so Resume continues from the same offset.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "control_playback",
+      "arguments": {
+        "action": "pause",
+        "track_ids": null,
+        "context_uri": null,
+        "position_ms": null,
+        "volume_percent": null,
+        "state": null,
+        "device_id": null
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 4000

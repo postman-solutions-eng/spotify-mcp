@@ -1,0 +1,31 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** create a playlist owned by the signed-in user.
+
+  **Result:** Not executed: mutates the live account. Left documented, unrun, on purpose. It would leave a real playlist behind on the account.
+
+  Known upstream quirk: a playlist created with `public: false` reads back as
+  `public: true`. The request body is correct — that is Spotify's reporting. Confirm
+  privacy in the Spotify app rather than trusting the response.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "create_playlist",
+      "arguments": {
+        "name": "MCP smoke test",
+        "description": "Created from the Postman collection",
+        "public": false
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 26000

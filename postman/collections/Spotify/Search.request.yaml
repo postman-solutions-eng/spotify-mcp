@@ -1,0 +1,36 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** track search, exercising the optional filter arguments
+  (`year`, `year_range`, `genre`, `artist`, `album`) explicitly passed as null.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): `total: 12`. Top hit is the exact match —
+  "Und dann kommt ein Mensch" — Major Sunburn (`6ADPS6h7kuqZwqekUrLTEp`, 2026-01-22).
+  Explicit nulls are accepted rather than rejected.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "search_music",
+      "arguments": {
+        "query": "Und dann kommt ein Mensch",
+        "qtype": "track",
+        "limit": 10,
+        "offset": 0,
+        "year": null,
+        "year_range": null,
+        "genre": null,
+        "artist": null,
+        "album": null
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 6000

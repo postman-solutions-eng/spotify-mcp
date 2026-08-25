@@ -1,0 +1,33 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** set device volume. `action: volume` requires `volume_percent`; the other
+  arguments are ignored.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): volume 90 on `PM-MYKFWG6W19`, playback uninterrupted
+  (`is_playing: true`, `progress_ms: 12211`).
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "control_playback",
+      "arguments": {
+        "action": "volume",
+        "track_ids": null,
+        "context_uri": null,
+        "position_ms": null,
+        "volume_percent": 90,
+        "state": null,
+        "device_id": null
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 16000

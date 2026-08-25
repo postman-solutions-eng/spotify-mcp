@@ -1,0 +1,35 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** demonstrate the elicitation gate. `remove_tracks_from_playlist` is marked
+  destructive, so the server asks the client to confirm before deleting anything.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): the server issued an elicitation request; it was **declined**,
+  yielding `{"status": "cancelled", "message": "Removal cancelled by user",
+  "snapshot_id": null}`. "My playlist #1" was left untouched with its single track.
+
+  Declining is the documented happy path for this request — its point is the prompt, not
+  the deletion. Approving would remove "Dandelions" — Ruth B.
+  (`2eAvDnpXP5W0cVtiI0PUxV`) and leave the playlist empty.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "remove_tracks_from_playlist",
+      "arguments": {
+        "playlist_id": "1SFakhKgD1SbrY6DeUKUZQ",
+        "track_uris": [
+          "2eAvDnpXP5W0cVtiI0PUxV"
+        ]
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 14000

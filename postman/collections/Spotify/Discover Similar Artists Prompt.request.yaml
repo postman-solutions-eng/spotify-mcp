@@ -1,0 +1,33 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** the `discover_similar` prompt — how to answer "artists like X" now that
+  Spotify has withdrawn related-artists and `/recommendations` from third-party apps.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio), read from the prompt implementation): returns a template telling the
+  client to chain `get_artist_info` for genres → `search_music` with `genre:`/`year:`
+  filters → `get_top_items` to bias toward known taste, then return 8-10 artists with a
+  representative track each.
+
+  Caveat worth knowing before relying on it: step 1 calls `get_artist_info`, which is
+  currently dead (see "Artist Info Major Tom"). Substitute the
+  `spotify://artist/{id}` resource until that is fixed.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "prompts/get",
+    "params": {
+      "name": "discover_similar",
+      "arguments": {
+        "artist": "Robert Miles"
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 41000

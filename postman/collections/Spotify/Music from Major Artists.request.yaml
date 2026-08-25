@@ -1,0 +1,33 @@
+$kind: mcp-request
+description: |-
+  **Purpose:** artist-type search (`qtype: artist`) rather than track search.
+
+  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): `total: 11`; top hit Major Sunburn
+  (`5zbSsk4Qg514fYzb3KhQX7`). Other hits are fuzzy name matches (Sunbeam, Major Lazer,
+  Major Moment, Peter Schilling).
+
+  Shape note: artist results populate only `name`, `id`, `artist` and `external_urls` —
+  `album`, `artists`, `duration_ms` and `release_date` are all null, because those fields
+  do not apply to an artist.
+transport: stdio
+command: uvx spotify-mcp-jamiew
+env:
+  SPOTIFY_CLIENT_ID: "{{SPOTIFY_CLIENT_ID}}"
+  SPOTIFY_REDIRECT_URI: "{{SPOTIFY_REDIRECT_URI}}"
+  SPOTIFY_CLIENT_SECRET: "{{SPOTIFY_CLIENT_SECRET}}"
+message: |-
+  {
+    "method": "tools/call",
+    "params": {
+      "name": "search_music",
+      "arguments": {
+        "query": "Major Sunburn",
+        "qtype": "artist",
+        "limit": 10
+      }
+    }
+  }
+settings:
+  version: auto
+  requestTimeout: 0
+order: 17000
