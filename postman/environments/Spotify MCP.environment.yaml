@@ -21,3 +21,20 @@ values:
     description: >-
       OAuth redirect URI. Not sensitive, but must match the redirect registered on the
       Spotify app exactly.
+  - key: SPOTIFY_REFRESH_TOKEN
+    value: '{{vault:spotify-mcp-refresh-token}}'
+    type: default
+    enabled: true
+    description: >-
+      Resolves from the Postman Vault key `spotify-mcp-refresh-token`. Used by the "Spotify
+      REST Workflow - *" collections to mint a user access token the same way spotipy's
+      SpotifyOAuth does, without repeating the browser consent flow. Create the key via
+      Vault in the Postman desktop app after completing the OAuth flow once.
+  - key: ANTHROPIC_API_KEY
+    value: '{{vault:spotify-mcp-anthropic-key}}'
+    type: default
+    enabled: true
+    description: >-
+      Resolves from the Postman Vault key `spotify-mcp-anthropic-key`. Used by the AI
+      Workflow requests below to call the model; not needed to run anything else in this
+      collection.

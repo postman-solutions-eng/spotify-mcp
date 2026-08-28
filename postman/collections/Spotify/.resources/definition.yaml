@@ -44,6 +44,22 @@ description: |-
     unreachable; loop the single-ID form. Same shape as the `get_artist_info` defect.
       
 
+  ## AI Workflow Requests
+
+  Four `llm-request` items complement the raw `mcp-request` calls above: **Queue
+  Similar Tracks**, **Build Discovery Playlist**, **Resume Liked Songs** and
+  **Clean Up Duplicate Tracks AI Request**. Each hands a model a natural-language
+  goal plus this server configured as an MCP tool source (via `mcpConfig`), and
+  lets the model decide which tools to call and in what order - unlike the
+  `prompts/get` requests above, which only fetch a prompt template rather than
+  executing anything.
+
+  Each has a matching top-level collection, `Spotify REST Workflow - <name>`, that
+  pins down the literal Spotify Web API calls behind that same workflow - no LLM,
+  no MCP server, just the HTTP requests `spotify_api.py`/`spotipy` would make,
+  chained together with collection variables in the order the tools would be
+  invoked.
+
   ## Provenance
 
   Documented and extended by Claude Code (Opus 5) on 2026-08-25 from the prompt below.
