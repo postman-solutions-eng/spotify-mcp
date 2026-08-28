@@ -1,0 +1,22 @@
+$kind: http-request
+name: Play liked songs
+description: |-
+  `PUT /v1/me/player/play` - the call behind the `control_playback` tool with
+  `action="play"` and `track_ids` set (`spotify_client.start_playback(device_id=...,
+  uris=...)`). Starts the liked songs from step 4 on the device transferred to in
+  step 3.
+method: PUT
+url: "https://api.spotify.com/v1/me/player/play?device_id={{deviceId}}"
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "uris": {{likedTrackUris}}
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("playback started", () => pm.response.to.have.status(204));
+order: 5000

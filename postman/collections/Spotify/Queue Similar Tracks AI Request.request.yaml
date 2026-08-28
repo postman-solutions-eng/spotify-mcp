@@ -1,0 +1,74 @@
+$kind: llm-request
+name: Queue Similar Tracks AI Request
+description: |-
+  **Purpose:** an AI request (not a raw MCP `tools/call`) that hands the model a
+  natural-language goal and the Spotify MCP server as a configured tool, and lets it
+  decide which tools to call and in what order.
+
+  This workflow chains three tools the model must sequence itself:
+  `get_playback_state` → `search_music` → `add_to_queue` (twice). The literal HTTP
+  calls this produces are pinned down, request by request, in the sibling REST
+  collection **Spotify REST Workflow - Queue Similar Tracks**, which calls the same
+  Spotify Web API endpoints directly with no LLM and no MCP server in the path.
+
+  Needs `OPENAI_API_KEY` in addition to the usual `SPOTIFY_CLIENT_ID` /
+  `SPOTIFY_CLIENT_SECRET` / `SPOTIFY_REDIRECT_URI`.
+url: https://api.openai.com/v1/chat/completions
+config:
+  model: gpt-5
+  provider: openai
+settings:
+  temperature: 0.2
+  maxToken: 2048
+  streamResponse: false
+  responseFormatJSON: false
+  maxSteps: 16
+  streamTools: false
+userPrompts:
+- id: '1'
+  value: |-
+    Look at what I'm currently playing, then queue up a couple more tracks in a
+    similar vein - same artist or a close genre neighbour, nothing I'm already
+    playing. Tell me what you queued and why.
+  timestamp: 1756080000000
+  active: true
+  contentType: text
+systemPrompts:
+- id: '1'
+  value: |-
+    You are a Spotify listening assistant. Use the connected Spotify tools to read
+    real state before acting - never invent track or artist names. Prefer the
+    fewest tool calls that get a correct result, and explain your reasoning briefly
+    after acting.
+  timestamp: 1756080000000
+  active: true
+  contentType: text
+mcpConfig: |-
+  [
+    {
+      "name": "spotify",
+      "config": {
+        "command": "uvx",
+        "args": [
+          "spotify-mcp-jamiew"
+        ],
+        "env": {
+          "SPOTIFY_CLIENT_ID": "{{vault:spotify-mcp-client-id}}",
+          "SPOTIFY_CLIENT_SECRET": "{{vault:spotify-mcp-client-secret}}",
+          "SPOTIFY_REDIRECT_URI": "http://127.0.0.1:8888"
+        }
+      },
+      "enabled": true,
+      "disabledTools": []
+    }
+  ]
+enabledTools:
+- get_playback_state
+- search_music
+- add_to_queue
+clientTools: []
+auth:
+  type: bearer
+  credentials:
+    https://api.openai.com: '{{OPENAI_API_KEY}}'
+order: 44000

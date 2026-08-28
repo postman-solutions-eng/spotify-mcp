@@ -1,0 +1,30 @@
+$kind: http-request
+name: Remove duplicate tracks
+description: |-
+  `DELETE /v1/playlists/{playlist_id}/items` - the restricted-regime call behind
+  the `remove_tracks_from_playlist` tool (`spotify_api.playlist_remove_items`).
+  Legacy fallback is `DELETE /v1/playlists/{playlist_id}/tracks` with the payload
+  keyed `tracks` instead of `items`. Removes every duplicate track URI accumulated
+  across the two paginated read steps. The MCP tool itself would elicit
+  confirmation before this call; this direct REST chain does not model that.
+method: DELETE
+url: "https://api.spotify.com/v1/playlists/{{playlistId}}/items"
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "items": {{duplicateTrackUris}}
+    }
+scripts:
+  - type: beforeRequest
+    code: |-
+      const duplicates = JSON.parse(pm.collectionVariables.get("duplicateTrackUris") || "[]");
+      if (duplicates.length === 0) {
+        console.log("No duplicates found - skipping removal call would need to happen here in a real run.");
+      }
+  - type: afterResponse
+    code: |-
+      pm.test("duplicate removal returns 200", () => pm.response.to.have.status(200));
+order: 6000

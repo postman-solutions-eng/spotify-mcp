@@ -1,0 +1,22 @@
+$kind: http-request
+name: Get top tracks
+description: |-
+  `GET /v1/me/top/tracks` - the call behind the `get_top_items` tool
+  (`spotify_client.current_user_top_tracks()`). Captures the top track's artist as
+  a discovery seed and the full set of returned track ids so step 3 can exclude
+  anything already known.
+method: GET
+url: https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=20
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("top tracks returns 200", () => pm.response.to.have.status(200));
+      const items = pm.response.json().items || [];
+      pm.test("has at least one top track", () => pm.expect(items.length).to.be.at.least(1));
+
+      const seedArtist = items.length ? items[0].artists[0].name : "trance";
+      const knownIds = items.map((t) => t.id);
+
+      pm.collectionVariables.set("seedArtist", encodeURIComponent(seedArtist));
+      pm.collectionVariables.set("knownTrackIds", JSON.stringify(knownIds));
+order: 2000

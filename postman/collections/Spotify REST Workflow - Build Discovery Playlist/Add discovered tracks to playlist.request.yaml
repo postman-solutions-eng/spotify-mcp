@@ -1,0 +1,21 @@
+$kind: http-request
+name: Add discovered tracks to playlist
+description: |-
+  `POST /v1/playlists/{playlist_id}/items` - the restricted-regime call behind the
+  `add_tracks_to_playlist` tool (`spotify_api.playlist_add_items`). Adds the tracks
+  found in step 3 to the playlist created in step 4.
+method: POST
+url: "https://api.spotify.com/v1/playlists/{{playlistId}}/items"
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "uris": {{discoveryTrackUris}}
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("tracks added", () => pm.response.to.have.status(201));
+order: 5000

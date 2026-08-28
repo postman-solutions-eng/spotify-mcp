@@ -1,0 +1,40 @@
+$kind: collection
+name: Spotify REST Workflow - Clean Up Duplicate Tracks
+description: |-
+  The literal Spotify Web API calls behind the **Clean Up Duplicate Tracks AI
+  Request** in the `Spotify` collection - no MCP server, no LLM, no mocks. Each
+  request is one of the HTTP calls behind the `get_user_playlists`,
+  `get_playlist_info`, `get_playlist_tracks` and `remove_tracks_from_playlist`
+  tools, chained with collection variables in the order an agent following that
+  prompt would need them.
+
+  ## Chain
+
+  1. **Get user access token** - refresh-token grant.
+  2. **Get user playlists** - `GET /v1/me/playlists`, the call behind
+     `get_user_playlists`. Picks the playlist with the most tracks.
+  3. **Get playlist info** - `GET /v1/playlists/{id}`, the call behind
+     `get_playlist_info`.
+  4/5. **Get playlist tracks page 1/2** - `GET /v1/playlists/{id}/items`, the
+     restricted-regime call behind `get_playlist_tracks`
+     (`spotify_api.playlist_items`), at `offset=0` then `offset=100` - the exact
+     two-page walk the `analyze_large_playlist` prompt documents. Legacy fallback
+     for the same call is `GET /v1/playlists/{id}/tracks`. Duplicate track ids are
+     accumulated across both pages.
+  6. **Remove duplicate tracks** - `DELETE /v1/playlists/{id}/items`, the
+     restricted-regime call behind `remove_tracks_from_playlist`
+     (`spotify_api.playlist_remove_items`); legacy is `DELETE /v1/playlists/{id}/tracks`
+     with the payload keyed `tracks` instead of `items`. Only runs if step 4/5 found
+     a duplicate - the MCP tool itself would ask for elicitation confirmation here,
+     which this direct REST chain does not model.
+
+  ## Credentials
+
+  Needs `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` and `SPOTIFY_REFRESH_TOKEN` from
+  the **Spotify MCP** environment. **Destructive**: it removes real tracks from the
+  signed-in user's largest playlist if a duplicate is found.
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+order: 1000

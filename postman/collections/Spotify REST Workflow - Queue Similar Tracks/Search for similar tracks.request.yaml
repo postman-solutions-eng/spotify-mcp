@@ -1,0 +1,21 @@
+$kind: http-request
+name: Search for similar tracks
+description: |-
+  `GET /v1/search` - the call behind the `search_music` tool
+  (`spotify_client.search(q=..., type="track")`), filtered to the artist captured
+  from the previous step. Excludes the currently-playing track and picks two
+  candidates for the following queue calls.
+method: GET
+url: "https://api.spotify.com/v1/search?q=artist:{{seedArtist}}&type=track&limit=10"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("search returns 200", () => pm.response.to.have.status(200));
+      const items = pm.response.json().tracks.items.filter(
+        (t) => t.id !== pm.collectionVariables.get("currentTrackId")
+      );
+      pm.test("found at least two candidate tracks", () => pm.expect(items.length).to.be.at.least(2));
+
+      pm.collectionVariables.set("queueTrackUri1", items[0] ? `spotify:track:${items[0].id}` : "");
+      pm.collectionVariables.set("queueTrackUri2", items[1] ? `spotify:track:${items[1].id}` : "");
+order: 3000

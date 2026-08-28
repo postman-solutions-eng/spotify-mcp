@@ -1,0 +1,30 @@
+$kind: collection
+name: Spotify REST Workflow - Resume Liked Songs
+description: |-
+  The literal Spotify Web API calls behind the **Resume Liked Songs AI Request** in
+  the `Spotify` collection - no MCP server, no LLM, no mocks. Each request is one of
+  the HTTP calls behind the `list_devices`, `transfer_playback`, `get_saved_tracks`
+  and `control_playback` tools, chained with collection variables in the order an
+  agent following that prompt would need them.
+
+  ## Chain
+
+  1. **Get user access token** - refresh-token grant.
+  2. **List devices** - `GET /v1/me/player/devices`, the call behind `list_devices`.
+     Picks a target device, preferring anything that isn't a phone.
+  3. **Transfer playback** - `PUT /v1/me/player`, the call behind `transfer_playback`
+     (`spotify_client.transfer_playback`).
+  4. **Get liked songs** - `GET /v1/me/tracks`, the call behind `get_saved_tracks`.
+  5. **Play liked songs** - `PUT /v1/me/player/play`, the call behind
+     `control_playback(action="play", track_ids=...)`.
+
+  ## Credentials
+
+  Needs `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` and `SPOTIFY_REFRESH_TOKEN` from
+  the **Spotify MCP** environment, plus Premium and at least one available device -
+  same prerequisites as the tools it mirrors. Starts real playback on the account.
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+order: 1000

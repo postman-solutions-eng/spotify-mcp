@@ -1,0 +1,25 @@
+$kind: http-request
+name: Create playlist
+description: |-
+  `POST /v1/me/playlists` - the restricted-regime call behind the `create_playlist`
+  tool (`spotify_api.create_playlist`). Captures the new playlist id for the add
+  step. Known upstream quirk: this reads back as `public: true` even though the
+  body below asks for `public: false` - that is Spotify's reporting, not a bug here.
+method: POST
+url: https://api.spotify.com/v1/me/playlists
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "AI Discovery Mix",
+      "description": "Generated from top tracks plus adjacent search discoveries",
+      "public": false
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("playlist created", () => pm.response.to.have.status(201));
+      pm.collectionVariables.set("playlistId", pm.response.json().id);
+order: 4000

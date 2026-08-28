@@ -1,0 +1,30 @@
+$kind: http-request
+name: Get playlist tracks page 1
+description: |-
+  `GET /v1/playlists/{playlist_id}/items` - the restricted-regime call behind the
+  `get_playlist_tracks` tool (`spotify_api.playlist_items`), first page. Legacy
+  fallback for the same call is `GET /v1/playlists/{playlist_id}/tracks`. Records
+  every track id seen so far, and flags any id seen more than once as a duplicate.
+method: GET
+url: "https://api.spotify.com/v1/playlists/{{playlistId}}/items?limit=100&offset=0"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("playlist tracks page 1 returns 200", () => pm.response.to.have.status(200));
+      const items = pm.response.json().items || [];
+      const seen = JSON.parse(pm.collectionVariables.get("seenTrackIds") || "[]");
+      const duplicates = JSON.parse(pm.collectionVariables.get("duplicateTrackUris") || "[]");
+
+      for (const entry of items) {
+        const track = entry.item || entry.track;
+        if (!track) continue;
+        if (seen.includes(track.id)) {
+          duplicates.push({ uri: track.uri });
+        } else {
+          seen.push(track.id);
+        }
+      }
+
+      pm.collectionVariables.set("seenTrackIds", JSON.stringify(seen));
+      pm.collectionVariables.set("duplicateTrackUris", JSON.stringify(duplicates));
+order: 4000

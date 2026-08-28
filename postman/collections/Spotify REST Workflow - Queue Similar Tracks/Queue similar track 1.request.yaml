@@ -1,0 +1,13 @@
+$kind: http-request
+name: Queue similar track 1
+description: |-
+  `POST /v1/me/player/queue` - the call behind the `add_to_queue` tool
+  (`spotify_client.add_to_queue(uri)`), for the first track found in the previous
+  search step.
+method: POST
+url: "https://api.spotify.com/v1/me/player/queue?uri={{queueTrackUri1}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("track 1 queued", () => pm.response.to.have.status(204));
+order: 4000

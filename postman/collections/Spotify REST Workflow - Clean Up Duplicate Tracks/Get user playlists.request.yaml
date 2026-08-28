@@ -1,0 +1,20 @@
+$kind: http-request
+name: Get user playlists
+description: |-
+  `GET /v1/me/playlists` - the call behind the `get_user_playlists` tool
+  (`spotify_client.current_user_playlists()`). Picks the playlist with the most
+  tracks as the cleanup target.
+method: GET
+url: https://api.spotify.com/v1/me/playlists?limit=50
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("user playlists returns 200", () => pm.response.to.have.status(200));
+      const items = pm.response.json().items || [];
+      pm.test("has at least one playlist", () => pm.expect(items.length).to.be.at.least(1));
+
+      const largest = items.reduce(
+        (a, b) => ((b.tracks && b.tracks.total) || 0) > ((a.tracks && a.tracks.total) || 0) ? b : a
+      );
+      pm.collectionVariables.set("playlistId", largest.id);
+order: 2000

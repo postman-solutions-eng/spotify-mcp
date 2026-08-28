@@ -21,3 +21,27 @@ values:
     description: >-
       OAuth redirect URI. Not sensitive, but must match the redirect registered on the
       Spotify app exactly.
+  - key: SPOTIFY_REFRESH_TOKEN
+    value: '{{vault:spotify-mcp-refresh-token}}'
+    type: default
+    enabled: true
+    description: >-
+      Resolves from the Postman Vault key `spotify-mcp-refresh-token`. Used by the "Spotify
+      REST Workflow - *" collections to mint a user access token the same way spotipy's
+      SpotifyOAuth does, without repeating the browser consent flow. Create the key via
+      Vault in the Postman desktop app after completing the OAuth flow once.
+  - key: OPENAI_API_KEY
+    value: '{{vault:spotify-mcp-openai-key}}'
+    type: default
+    enabled: true
+    description: >-
+      Resolves from the Postman Vault key `spotify-mcp-openai-key`. Used by the AI Workflow
+      requests to call the model; not needed to run anything else in this collection.
+  - key: DEVICE_ID
+    value: ''
+    type: default
+    enabled: true
+    description: >-
+      Target device for "Transfer playback". Empty by design: Spotify issues device ids per
+      session, so there is no stable value to ship. Run "List devices" and paste a current
+      id here. Note an iOS device will refuse volume changes — see "90 percent volume".

@@ -1,0 +1,18 @@
+$kind: http-request
+name: Get liked songs
+description: |-
+  `GET /v1/me/tracks` - the call behind the `get_saved_tracks` tool
+  (`spotify_client.current_user_saved_tracks()`). Captures the track URIs to hand
+  to the play call.
+method: GET
+url: https://api.spotify.com/v1/me/tracks?limit=20
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("liked songs returns 200", () => pm.response.to.have.status(200));
+      const items = pm.response.json().items || [];
+      pm.test("has at least one liked song", () => pm.expect(items.length).to.be.at.least(1));
+
+      const uris = items.map((i) => i.track.uri);
+      pm.collectionVariables.set("likedTrackUris", JSON.stringify(uris));
+order: 4000

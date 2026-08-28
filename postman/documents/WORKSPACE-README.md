@@ -1,26 +1,45 @@
 # Testing V12
 
 Working workspace for the [spotify-mcp](https://github.com/jonico/spotify-mcp) server — a
-FastMCP-based MCP server for the Spotify Web API. Two of the three collections here are
+FastMCP-based MCP server for the Spotify Web API. Six of the seven collections here are
 git-synced from that repo; edit them in the repo, not in the UI.
 
 ## Collections
 
-### Spotify — 43 AI (MCP) requests
+### Spotify — 43 MCP requests + 4 AI workflow requests
 
-Exercises the MCP server itself. Every request is an **AI request** speaking JSON-RPC to
+Exercises the MCP server itself. Most requests are `mcp-request` items speaking JSON-RPC to
 `uvx spotify-mcp-jamiew` over stdio, and together they cover the server's whole surface:
 **25/25 tools, 6/6 resources, 5/5 prompts**. Each request records its purpose and the real
 response captured against v0.4.1.
+
+Four `llm-request` items - **Queue Similar Tracks**, **Build Discovery Playlist**, **Resume
+Liked Songs** and **Clean Up Duplicate Tracks AI Request** - are genuine AI requests: a
+model, this server configured as an MCP tool via `mcpConfig`, and a natural-language goal
+that needs several tools chained together. They need `ANTHROPIC_API_KEY` in addition to the
+usual Spotify credentials.
 
 Requests whose description says "Not executed" would mutate the live Spotify account —
 create, rename, reorder, unfollow, unlike, queue, device transfer. They are documented on
 purpose and deliberately never run.
 
-> **These cannot run in the CLI or a monitor.** `postman collection run` skips
-> `mcp-request` items as unsupported ("Skipping N unsupported item(s)") and executes
-> nothing. Run them from the Postman app, or drive the equivalent tools through a connected
-> MCP client.
+> **The `mcp-request` items cannot run in the CLI or a monitor.** `postman collection run`
+> skips them as unsupported ("Skipping N unsupported item(s)") and executes nothing. Run
+> them from the Postman app, or drive the equivalent tools through a connected MCP client.
+
+### Spotify REST Workflow - * — 4 collections, 21 HTTP requests
+
+One collection per AI workflow request above, each pinning down the literal Spotify Web API
+calls that workflow implies - no LLM, no MCP server, no mocks. Every request maps to a
+specific `spotify_api.py`/`spotipy` call and chains into the next via collection variables
+(access token → read → search/list → write), the same order an agent following the matching
+prompt would need. Regime notes (restricted vs. legacy path) are called out per request
+where `with_fallback` picks between them.
+
+Needs the same `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` as the Spotify MCP environment,
+plus `SPOTIFY_REFRESH_TOKEN` to mint a user access token without repeating the OAuth consent
+flow. The playlist- and playback-mutating requests are real writes against the signed-in
+account when run.
 
 ### Spotify API Conformance — 8 HTTP requests, 17 assertions
 
@@ -45,7 +64,7 @@ resolve. Sample/demo content.
 
 | Environment | Git-synced | Credentials resolve from |
 |---|---|---|
-| **Spotify MCP** | yes | Postman Vault: `spotify-mcp-client-id`, `spotify-mcp-client-secret` |
+| **Spotify MCP** | yes | Postman Vault: `spotify-mcp-client-id`, `spotify-mcp-client-secret`, `spotify-mcp-refresh-token`, `spotify-mcp-anthropic-key` |
 | **Spotify API Conformance** | **no — cloud only** | values stored in the cloud environment |
 
 The asymmetry is deliberate and load-bearing. Vault values are local and never sync, so they
@@ -56,8 +75,8 @@ monitor's environment is kept out of git sync entirely: there is no file for it 
 `postman/environments/` and no entry in `.postman/resources.yaml`. Edit that one in the UI or
 via the API, never from the repo.
 
-Pick **Spotify MCP** for the AI requests, **Spotify API Conformance** for the conformance
-collection and its monitor.
+Pick **Spotify MCP** for the AI/MCP requests and the four `Spotify REST Workflow - *`
+collections, **Spotify API Conformance** for the conformance collection and its monitor.
 
 ## Monitor
 

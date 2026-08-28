@@ -1,0 +1,76 @@
+$kind: llm-request
+name: Build Discovery Playlist AI Request
+description: |-
+  **Purpose:** an AI request that turns the user's listening history into a new
+  playlist, letting the model decide how to chain tools rather than scripting the
+  JSON-RPC calls by hand.
+
+  Expects the model to sequence `get_top_items` → `search_music` (possibly several
+  times, varying the query/offset) → `create_playlist` → `add_tracks_to_playlist`.
+  The exact HTTP calls behind that sequence - including which of the two Feb 2026
+  API regimes each one lands on - are pinned down in the sibling REST collection
+  **Spotify REST Workflow - Build Discovery Playlist**.
+
+  Needs `OPENAI_API_KEY` in addition to the usual `SPOTIFY_CLIENT_ID` /
+  `SPOTIFY_CLIENT_SECRET` / `SPOTIFY_REDIRECT_URI`.
+url: https://api.openai.com/v1/chat/completions
+config:
+  model: gpt-5
+  provider: openai
+settings:
+  temperature: 0.2
+  maxToken: 2048
+  streamResponse: false
+  responseFormatJSON: false
+  maxSteps: 16
+  streamTools: false
+userPrompts:
+- id: '1'
+  value: |-
+    Build me a discovery playlist from my medium-term top tracks: find songs that
+    are adjacent to what I already like but that I'm not already listening to, and
+    put 15-20 of them in a new playlist called "AI Discovery Mix". Give it a short
+    description saying what it's based on.
+  timestamp: 1756080000000
+  active: true
+  contentType: text
+systemPrompts:
+- id: '1'
+  value: |-
+    You are a Spotify listening assistant. Use the connected Spotify tools to read
+    real listening history before searching - never invent track or artist names.
+    Cross-check new finds against what the user already has so the playlist adds
+    variety instead of repeating it. Explain your reasoning briefly after acting.
+  timestamp: 1756080000000
+  active: true
+  contentType: text
+mcpConfig: |-
+  [
+    {
+      "name": "spotify",
+      "config": {
+        "command": "uvx",
+        "args": [
+          "spotify-mcp-jamiew"
+        ],
+        "env": {
+          "SPOTIFY_CLIENT_ID": "{{vault:spotify-mcp-client-id}}",
+          "SPOTIFY_CLIENT_SECRET": "{{vault:spotify-mcp-client-secret}}",
+          "SPOTIFY_REDIRECT_URI": "http://127.0.0.1:8888"
+        }
+      },
+      "enabled": true,
+      "disabledTools": []
+    }
+  ]
+enabledTools:
+- get_top_items
+- search_music
+- create_playlist
+- add_tracks_to_playlist
+clientTools: []
+auth:
+  type: bearer
+  credentials:
+    https://api.openai.com: '{{OPENAI_API_KEY}}'
+order: 45000

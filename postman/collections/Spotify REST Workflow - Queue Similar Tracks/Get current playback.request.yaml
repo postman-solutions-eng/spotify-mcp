@@ -1,0 +1,29 @@
+$kind: http-request
+name: Get current playback
+description: |-
+  `GET /v1/me/player` - the call behind the `get_playback_state` tool
+  (`spotify_client.current_playback()`). Returns 204 with an empty body when
+  nothing is playing; the script covers that by falling back to a fixed seed
+  artist so the rest of the chain still has something to search for.
+method: GET
+url: https://api.spotify.com/v1/me/player
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("playback state is readable", () => pm.response.to.have.status.oneOf([200, 204]));
+
+      let seedArtist = "trance";
+      let currentTrackId = "";
+
+      if (pm.response.code === 200 && pm.response.text()) {
+        const state = pm.response.json();
+        const item = state && state.item;
+        if (item && item.artists && item.artists.length) {
+          seedArtist = item.artists[0].name;
+          currentTrackId = item.id;
+        }
+      }
+
+      pm.collectionVariables.set("seedArtist", encodeURIComponent(seedArtist));
+      pm.collectionVariables.set("currentTrackId", currentTrackId);
+order: 2000

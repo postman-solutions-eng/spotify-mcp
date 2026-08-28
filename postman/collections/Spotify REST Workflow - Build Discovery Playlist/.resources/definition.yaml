@@ -1,0 +1,36 @@
+$kind: collection
+name: Spotify REST Workflow - Build Discovery Playlist
+description: |-
+  The literal Spotify Web API calls behind the **Build Discovery Playlist AI
+  Request** in the `Spotify` collection - no MCP server, no LLM, no mocks. Each
+  request is one of the HTTP calls behind the `get_top_items`, `search_music`,
+  `create_playlist` and `add_tracks_to_playlist` tools, chained with collection
+  variables in the order an agent following that prompt would need them.
+
+  ## Chain
+
+  1. **Get user access token** - refresh-token grant.
+  2. **Get top tracks** - `GET /v1/me/top/tracks`, the call behind `get_top_items`.
+     Captures a seed artist and the set of track ids already known.
+  3. **Search adjacent tracks** - `GET /v1/search`, the call behind `search_music`,
+     scoped to the seed artist at `offset=20` to surface deeper cuts instead of the
+     same top hits, filtered against the known-tracks set from step 2.
+  4. **Create playlist** - `POST /v1/me/playlists`, the call behind
+     `create_playlist`. This app's regime resolves to the **restricted** path
+     (`create-playlist` family in `spotify_api.with_fallback`); the legacy fallback
+     is `POST /v1/users/{user_id}/playlists` and needs a `GET /v1/me` first for the
+     user id, which is why it is not chained here.
+  5. **Add discovered tracks to playlist** - `POST /v1/playlists/{playlist_id}/items`,
+     the call behind `add_tracks_to_playlist`. Same regime note: legacy is
+     `POST /v1/playlists/{playlist_id}/tracks`.
+
+  ## Credentials
+
+  Needs `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` and `SPOTIFY_REFRESH_TOKEN` from
+  the **Spotify MCP** environment. Creates a real, non-destructive playlist on the
+  signed-in account each time it runs.
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+order: 1000

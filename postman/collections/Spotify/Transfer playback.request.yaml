@@ -1,10 +1,39 @@
 $kind: mcp-request
 description: |-
-  **Purpose:** move playback to another device — the documented recovery when
-  `list_devices` shows no active device and playback tools therefore fail.
+  **Purpose:** move playback to another device — the documented recovery when a playback
+  tool fails with `NO_ACTIVE_DEVICE`.
 
-  **Result:** Not executed: mutates the live account. Left documented, unrun, on purpose. Running it would move your audio to the Chrome web player
-  mid-listen. Device IDs are per-session; refresh them with "List devices" first.
+  **Before running:** set `DEVICE_ID` in the environment to an id from "List devices".
+  Device ids are issued per session and are not stable, so a hard-coded one will not
+  work for you. Devices also appear and disappear as apps open and close: a phone that
+  is absent from the list can show up minutes later without anything being configured.
+
+  **Behaviour:** returns
+  `{"status": "success", "message": "Playback transferred", "snapshot_id": null}` and
+  moves playback mid-track. The track, its position and the shuffle/repeat state are all
+  preserved — this hands the same session to a different speaker rather than restarting
+  anything. With `play: false` the target device is made active but stays paused, which
+  is the useful form when you only need *an* active device so a later `control_playback`
+  call has somewhere to go.
+
+  **Caveat — iOS targets refuse volume changes.** Once playback is on an iPhone or iPad,
+  `control_playback` with `action: volume` fails:
+
+  ```
+  Playback is restricted for this content
+  (spotify reason: VOLUME_CONTROL_DISALLOW) [playback_restricted]
+  ```
+
+  This is a platform restriction, not a defect in this server. Volume on an iOS device
+  belongs to the device — hardware buttons or Control Centre — and Spotify's Web API
+  will not override it. The same call succeeds against desktop and web targets, so
+  either control volume before transferring, or transfer to a desktop device when you
+  need programmatic volume.
+
+  Worth noting the error carries Spotify's own `reason`, which is what makes it
+  diagnosable. Compare the bare `playback_restricted` returned by `get_artist_info` and
+  by batched `get_track_info`, where no reason is supplied and the cause has to be
+  inferred.
 transport: stdio
 command: uvx spotify-mcp-jamiew
 env:
@@ -17,7 +46,7 @@ message: |-
     "params": {
       "name": "transfer_playback",
       "arguments": {
-        "device_id": "c207cabc8f0e687fe1e1cf9e0253bffe5c51dba8",
+        "device_id": "{{DEVICE_ID}}",
         "play": true
       }
     }

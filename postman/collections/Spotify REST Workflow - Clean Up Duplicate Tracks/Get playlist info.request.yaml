@@ -1,0 +1,17 @@
+$kind: http-request
+name: Get playlist info
+description: |-
+  `GET /v1/playlists/{playlist_id}` - the call behind the `get_playlist_info` tool
+  (`spotify_client.playlist(fields="id,name,description,owner,public,tracks.total")`).
+  Confirms the track count for the paginated walk in the next two steps.
+method: GET
+url: "https://api.spotify.com/v1/playlists/{{playlistId}}?fields=id,name,description,owner,public,tracks.total"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("playlist info returns 200", () => pm.response.to.have.status(200));
+      const total = (pm.response.json().tracks || {}).total || 0;
+      pm.collectionVariables.set("totalTracks", String(total));
+      pm.collectionVariables.set("seenTrackIds", JSON.stringify([]));
+      pm.collectionVariables.set("duplicateTrackUris", JSON.stringify([]));
+order: 3000
