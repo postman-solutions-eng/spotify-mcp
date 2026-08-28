@@ -11,60 +11,64 @@ description: |-
   collection **Spotify REST Workflow - Queue Similar Tracks**, which calls the same
   Spotify Web API endpoints directly with no LLM and no MCP server in the path.
 
-  Needs `ANTHROPIC_API_KEY` in addition to the usual `SPOTIFY_CLIENT_ID` /
+  Needs `OPENAI_API_KEY` in addition to the usual `SPOTIFY_CLIENT_ID` /
   `SPOTIFY_CLIENT_SECRET` / `SPOTIFY_REDIRECT_URI`.
+url: https://api.openai.com/v1/chat/completions
 config:
-  model: claude-sonnet-4-5
-  provider: anthropic
-url: https://api.anthropic.com/v1/messages
-userPrompts:
-  - id: "1"
-    value: |-
-      Look at what I'm currently playing, then queue up a couple more tracks in a
-      similar vein - same artist or a close genre neighbour, nothing I'm already
-      playing. Tell me what you queued and why.
-    timestamp: 1756080000000
-    active: true
-    type: text
-systemPrompts:
-  - id: "1"
-    value: |-
-      You are a Spotify listening assistant. Use the connected Spotify tools to read
-      real state before acting - never invent track or artist names. Prefer the
-      fewest tool calls that get a correct result, and explain your reasoning briefly
-      after acting.
-    timestamp: 1756080000000
-    active: true
-    type: text
-mcpConfig: |-
-  {
-    "mcpServers": {
-      "spotify": {
-        "transport": "stdio",
-        "command": "uvx spotify-mcp-jamiew",
-        "env": {
-          "SPOTIFY_CLIENT_ID": "{{SPOTIFY_CLIENT_ID}}",
-          "SPOTIFY_CLIENT_SECRET": "{{SPOTIFY_CLIENT_SECRET}}",
-          "SPOTIFY_REDIRECT_URI": "{{SPOTIFY_REDIRECT_URI}}"
-        }
-      }
-    }
-  }
-enabledTools:
-  - get_playback_state
-  - search_music
-  - add_to_queue
-auth:
-  type: apikey
-  credentials:
-    key: x-api-key
-    value: "{{ANTHROPIC_API_KEY}}"
-    addTo: header
+  model: gpt-5
+  provider: openai
 settings:
-  temperature: 0.4
-  maxToken: 1024
+  temperature: 0.2
+  maxToken: 2048
   streamResponse: false
   responseFormatJSON: false
-  maxSteps: 8
+  maxSteps: 16
   streamTools: false
+userPrompts:
+- id: '1'
+  value: |-
+    Look at what I'm currently playing, then queue up a couple more tracks in a
+    similar vein - same artist or a close genre neighbour, nothing I'm already
+    playing. Tell me what you queued and why.
+  timestamp: 1756080000000
+  active: true
+  contentType: text
+systemPrompts:
+- id: '1'
+  value: |-
+    You are a Spotify listening assistant. Use the connected Spotify tools to read
+    real state before acting - never invent track or artist names. Prefer the
+    fewest tool calls that get a correct result, and explain your reasoning briefly
+    after acting.
+  timestamp: 1756080000000
+  active: true
+  contentType: text
+mcpConfig: |-
+  [
+    {
+      "name": "spotify",
+      "config": {
+        "command": "uvx",
+        "args": [
+          "spotify-mcp-jamiew"
+        ],
+        "env": {
+          "SPOTIFY_CLIENT_ID": "{{vault:spotify-mcp-client-id}}",
+          "SPOTIFY_CLIENT_SECRET": "{{vault:spotify-mcp-client-secret}}",
+          "SPOTIFY_REDIRECT_URI": "http://127.0.0.1:8888"
+        }
+      },
+      "enabled": true,
+      "disabledTools": []
+    }
+  ]
+enabledTools:
+- get_playback_state
+- search_music
+- add_to_queue
+clientTools: []
+auth:
+  type: bearer
+  credentials:
+    https://api.openai.com: '{{OPENAI_API_KEY}}'
 order: 44000

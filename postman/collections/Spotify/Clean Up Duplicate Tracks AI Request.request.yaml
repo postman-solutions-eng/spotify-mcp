@@ -10,56 +10,12 @@ description: |-
   The literal HTTP calls behind that sequence are pinned down in the sibling REST
   collection **Spotify REST Workflow - Clean Up Duplicate Tracks**.
 
-  Needs `ANTHROPIC_API_KEY` in addition to the usual `SPOTIFY_CLIENT_ID` /
+  Needs `OPENAI_API_KEY` in addition to the usual `SPOTIFY_CLIENT_ID` /
   `SPOTIFY_CLIENT_SECRET` / `SPOTIFY_REDIRECT_URI`.
+url: https://api.openai.com/v1/chat/completions
 config:
-  model: claude-sonnet-4-5
-  provider: anthropic
-url: https://api.anthropic.com/v1/messages
-userPrompts:
-  - id: "1"
-    value: |-
-      Find my largest playlist, page through all of its tracks, and remove any exact
-      duplicate tracks you find (same track ID appearing more than once). Tell me
-      which playlist you cleaned and how many duplicates you removed before doing it.
-    timestamp: 1756080000000
-    active: true
-    type: text
-systemPrompts:
-  - id: "1"
-    value: |-
-      You are a Spotify library assistant. This task is destructive - removing
-      tracks from a playlist cannot be undone - so read the full playlist with
-      pagination before removing anything, only remove exact duplicate track IDs,
-      and summarize what you are about to remove before calling the removal tool.
-    timestamp: 1756080000000
-    active: true
-    type: text
-mcpConfig: |-
-  {
-    "mcpServers": {
-      "spotify": {
-        "transport": "stdio",
-        "command": "uvx spotify-mcp-jamiew",
-        "env": {
-          "SPOTIFY_CLIENT_ID": "{{SPOTIFY_CLIENT_ID}}",
-          "SPOTIFY_CLIENT_SECRET": "{{SPOTIFY_CLIENT_SECRET}}",
-          "SPOTIFY_REDIRECT_URI": "{{SPOTIFY_REDIRECT_URI}}"
-        }
-      }
-    }
-  }
-enabledTools:
-  - get_user_playlists
-  - get_playlist_info
-  - get_playlist_tracks
-  - remove_tracks_from_playlist
-auth:
-  type: apikey
-  credentials:
-    key: x-api-key
-    value: "{{ANTHROPIC_API_KEY}}"
-    addTo: header
+  model: gpt-5
+  provider: openai
 settings:
   temperature: 0.2
   maxToken: 2048
@@ -67,4 +23,52 @@ settings:
   responseFormatJSON: false
   maxSteps: 16
   streamTools: false
+userPrompts:
+- id: '1'
+  value: |-
+    Find my largest playlist, page through all of its tracks, and remove any exact
+    duplicate tracks you find (same track ID appearing more than once). Tell me
+    which playlist you cleaned and how many duplicates you removed before doing it.
+  timestamp: 1756080000000
+  active: true
+  contentType: text
+systemPrompts:
+- id: '1'
+  value: |-
+    You are a Spotify library assistant. This task is destructive - removing
+    tracks from a playlist cannot be undone - so read the full playlist with
+    pagination before removing anything, only remove exact duplicate track IDs,
+    and summarize what you are about to remove before calling the removal tool.
+  timestamp: 1756080000000
+  active: true
+  contentType: text
+mcpConfig: |-
+  [
+    {
+      "name": "spotify",
+      "config": {
+        "command": "uvx",
+        "args": [
+          "spotify-mcp-jamiew"
+        ],
+        "env": {
+          "SPOTIFY_CLIENT_ID": "{{vault:spotify-mcp-client-id}}",
+          "SPOTIFY_CLIENT_SECRET": "{{vault:spotify-mcp-client-secret}}",
+          "SPOTIFY_REDIRECT_URI": "http://127.0.0.1:8888"
+        }
+      },
+      "enabled": true,
+      "disabledTools": []
+    }
+  ]
+enabledTools:
+- get_user_playlists
+- get_playlist_info
+- get_playlist_tracks
+- remove_tracks_from_playlist
+clientTools: []
+auth:
+  type: bearer
+  credentials:
+    https://api.openai.com: '{{OPENAI_API_KEY}}'
 order: 47000

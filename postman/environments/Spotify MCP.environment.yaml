@@ -30,14 +30,13 @@ values:
       REST Workflow - *" collections to mint a user access token the same way spotipy's
       SpotifyOAuth does, without repeating the browser consent flow. Create the key via
       Vault in the Postman desktop app after completing the OAuth flow once.
-  - key: ANTHROPIC_API_KEY
-    value: '{{vault:spotify-mcp-anthropic-key}}'
+  - key: OPENAI_API_KEY
+    value: '{{vault:spotify-mcp-openai-key}}'
     type: default
     enabled: true
     description: >-
-      Resolves from the Postman Vault key `spotify-mcp-anthropic-key`. Used by the AI
-      Workflow requests below to call the model; not needed to run anything else in this
-      collection.
+      Resolves from the Postman Vault key `spotify-mcp-openai-key`. Used by the AI Workflow
+      requests to call the model; not needed to run anything else in this collection.
   - key: DEVICE_ID
     value: ''
     type: default
