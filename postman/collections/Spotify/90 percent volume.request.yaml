@@ -3,8 +3,22 @@ description: |-
   **Purpose:** set device volume. `action: volume` requires `volume_percent`; the other
   arguments are ignored.
 
-  **Result** (Executed 2026-08-25 against spotify-mcp-jamiew 0.4.1 (stdio)): volume 90 on `PM-MYKFWG6W19`, playback uninterrupted
-  (`is_playing: true`, `progress_ms: 12211`).
+  **Behaviour:** sets the volume on the active device without interrupting playback —
+  the track keeps playing from the same position. Omit `device_id` to target whatever is
+  currently active, or pass one from "List devices" to set a specific device.
+
+  **Fails on iOS targets.** If the active device is an iPhone or iPad:
+
+  ```
+  Playback is restricted for this content
+  (spotify reason: VOLUME_CONTROL_DISALLOW) [playback_restricted]
+  ```
+
+  Volume on an iOS device belongs to the device itself — hardware buttons or Control
+  Centre — and Spotify's Web API will not override it. Desktop and web targets accept
+  the call normally. So this request's success depends on *where* playback currently is,
+  which "List devices" will tell you. See "Transfer playback" for the same caveat from
+  the other direction.
 transport: stdio
 command: uvx spotify-mcp-jamiew
 env:
