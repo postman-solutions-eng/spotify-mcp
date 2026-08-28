@@ -1,0 +1,32 @@
+$kind: collection
+name: Spotify REST Workflow - Queue Similar Tracks
+description: |-
+  The literal Spotify Web API calls behind the **Queue Similar Tracks AI Request**
+  in the `Spotify` collection - no MCP server, no LLM, no mocks. Each request is one
+  of the HTTP calls `spotify_api.py`/`spotipy` makes on behalf of the `get_playback_state`,
+  `search_music` and `add_to_queue` tools, run in the order an agent following that
+  prompt would actually need them, chained with collection variables instead of
+  being invoked independently.
+
+  ## Chain
+
+  1. **Get user access token** - refresh-token grant (what `SpotifyOAuth` does under
+     the hood before every tool call).
+  2. **Get current playback** - `GET /v1/me/player`, the call behind `get_playback_state`.
+     Captures the currently-playing artist and track id.
+  3. **Search for similar tracks** - `GET /v1/search`, the call behind `search_music`,
+     filtered to the captured artist and excluding the currently-playing track.
+  4/5. **Queue similar track 1/2** - `POST /v1/me/player/queue`, the call behind
+     `add_to_queue`, once per track found in step 3.
+
+  ## Credentials
+
+  Needs `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` and `SPOTIFY_REFRESH_TOKEN` from
+  the **Spotify MCP** environment. Requires an active playback session and Premium,
+  same as the tools it mirrors - if nothing is playing, step 2 falls back to a plain
+  "trance" search so the rest of the chain still has something to queue.
+auth:
+  type: bearer
+  credentials:
+    token: "{{access_token}}"
+order: 1000

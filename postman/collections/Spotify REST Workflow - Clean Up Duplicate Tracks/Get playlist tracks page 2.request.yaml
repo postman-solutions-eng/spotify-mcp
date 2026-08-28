@@ -1,0 +1,30 @@
+$kind: http-request
+name: Get playlist tracks page 2
+description: |-
+  `GET /v1/playlists/{playlist_id}/items` - the same restricted-regime call as the
+  previous step, second page (`offset=100`). This is the exact two-page walk the
+  `analyze_large_playlist` prompt documents for playlists over 100 tracks;
+  duplicate detection continues across both pages.
+method: GET
+url: "https://api.spotify.com/v1/playlists/{{playlistId}}/items?limit=100&offset=100"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("playlist tracks page 2 returns 200", () => pm.response.to.have.status(200));
+      const items = pm.response.json().items || [];
+      const seen = JSON.parse(pm.collectionVariables.get("seenTrackIds") || "[]");
+      const duplicates = JSON.parse(pm.collectionVariables.get("duplicateTrackUris") || "[]");
+
+      for (const entry of items) {
+        const track = entry.item || entry.track;
+        if (!track) continue;
+        if (seen.includes(track.id)) {
+          duplicates.push({ uri: track.uri });
+        } else {
+          seen.push(track.id);
+        }
+      }
+
+      pm.collectionVariables.set("seenTrackIds", JSON.stringify(seen));
+      pm.collectionVariables.set("duplicateTrackUris", JSON.stringify(duplicates));
+order: 5000

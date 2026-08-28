@@ -1,0 +1,27 @@
+$kind: http-request
+name: Get user access token
+description: |-
+  Refresh-token grant against Spotify's token endpoint - the same call spotipy's
+  `SpotifyOAuth` makes to refresh a cached user token before every tool invocation.
+  Every later request in this chain inherits the resulting `access_token` via the
+  collection's bearer auth.
+method: POST
+url: https://accounts.spotify.com/api/token
+headers:
+  Content-Type: application/x-www-form-urlencoded
+auth:
+  type: basic
+  credentials:
+    username: "{{SPOTIFY_CLIENT_ID}}"
+    password: "{{SPOTIFY_CLIENT_SECRET}}"
+body:
+  type: text
+  content: grant_type=refresh_token&refresh_token={{SPOTIFY_REFRESH_TOKEN}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("token endpoint returns 200", () => pm.response.to.have.status(200));
+      const token = pm.response.json().access_token;
+      pm.test("access_token present", () => pm.expect(token).to.be.a("string").and.not.empty);
+      pm.collectionVariables.set("access_token", token);
+order: 1000

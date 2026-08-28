@@ -1,0 +1,22 @@
+$kind: http-request
+name: Transfer playback
+description: |-
+  `PUT /v1/me/player` - the call behind the `transfer_playback` tool
+  (`spotify_client.transfer_playback(device_id, force_play=False)`). Moves
+  playback to the device picked in the previous step without starting it yet.
+method: PUT
+url: https://api.spotify.com/v1/me/player
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "device_ids": ["{{deviceId}}"],
+      "play": false
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("playback transferred", () => pm.response.to.have.status(204));
+order: 3000

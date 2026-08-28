@@ -1,0 +1,18 @@
+$kind: http-request
+name: List devices
+description: |-
+  `GET /v1/me/player/devices` - the call behind the `list_devices` tool
+  (`spotify_client.devices()`). Picks a target device for the transfer step,
+  preferring anything that isn't a `Smartphone`.
+method: GET
+url: https://api.spotify.com/v1/me/player/devices
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("devices list returns 200", () => pm.response.to.have.status(200));
+      const devices = pm.response.json().devices || [];
+      pm.test("has at least one device", () => pm.expect(devices.length).to.be.at.least(1));
+
+      const preferred = devices.find((d) => d.type !== "Smartphone") || devices[0];
+      pm.collectionVariables.set("deviceId", preferred.id);
+order: 2000
